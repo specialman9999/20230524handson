@@ -1,0 +1,328 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>webhookとLINEチャットの併用を体験してみよう！～チャットボットとLINEチャットの併用～</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  id="20230524"
+                  title="webhookとLINEチャットの併用を体験してみよう！～チャットボットとLINEチャットの併用～"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="本日のゴール" duration="0">
+        <p class="image-container"><img style="width: 716.99px" src="img\\a382e73b6b567318.png"></p>
+<p>ユーザーがLINE公式アカウントに問い合わせを行い、登録されている語句(完全一致)があればそのデータをメッセージ送信にして返します。</p>
+<p>登録されている語句がなければ、連続2回までは、語句を変えてくださいと送りますが、3回目には担当者につなぎますという文言を送り、担当者にはLINEnotifyでユーザーからの問い合わせ回答ができなかったというメッセージを送信して、担当者へLINEチャットで対応するように促すものを作ります。</p>
+<p>今回は、お試しで東京都文京区のゴミ分別をデータベースとして、チャットボットを作成します。<img style="width: 812.44px" src="img\\8c66254e3d11301a.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="LINE Developers への登録" duration="0">
+        <h2 is-upgraded>2．１ LINE Developers（<a href="https://developers.line.biz/ja/" target="_blank">https://developers.line.biz/ja/</a><strong>）からログイン</strong></h2>
+<p class="image-container"><img style="width: 624.00px" src="img\\b38d9d036ed9e327.png"></p>
+<h2 is-upgraded><strong>２．２．アカウントを入力</strong></h2>
+<pre>LINEアカウント・・・・・ 現在、利用しているLINEと連携することができます。
+ビジネスアカウント・・・ メールアドレスで登録することができます。</pre>
+<p>※LINEアカウントだと、スマホでQRコードを読み取ってログインができるなど簡単なのでおすすめです。</p>
+<aside class="special"><p>アカウントをお持ちの方は、ログインしてチャネル作成に進んでください。</p>
+</aside>
+<p>アカウントをお持ちでないかたは、これからアカウントを作成します。</p>
+<h3 is-upgraded><strong>２．２．１ アカウントの新規作成</strong></h3>
+<p> ①</p>
+<p> 初めての方は「アカウントの作成」を押下してください。</p>
+<p class="image-container"><img style="width: 371.00px" src="img\\72818972f2a31249.png"></p>
+<p> ②</p>
+<p>「LINEアカウントで登録」または「メールアドレスで登録」を選択してください。</p>
+<aside class="special"><p>LINEアカウントで登録のほうがQRコードログインでいけるので簡単です。個人のLINEアカウントと連携します。</p>
+</aside>
+<p>LINEアカウントで登録は簡単ですので、こちらでは、メールアドレスで登録の説明をします。</p>
+<p class="image-container"><img style="width: 436.00px" src="img\\67f814eb072f9bef.png"></p>
+<p>③登録するメールアドレスを入力してください。</p>
+<p class="image-container"><img style="width: 357.58px" src="img\\a2267bcb3b7ad5ca.png"></p>
+<p>④入力したメールアドレスに登録確認メールが届きますので「登録画面に進む」を押してください。</p>
+<p class="image-container"><img style="width: 512.00px" src="img\\625356f886eaca6.png"></p>
+<p>⑤名前とパスワードを入力して登録してください。</p>
+<p class="image-container"><img style="width: 333.00px" src="img\\44deccd44d63f30a.png"></p>
+<p>⑥登録確認画面で「登録」を押下</p>
+<p class="image-container"><img style="width: 403.00px" src="img\\c2d7990f51f0353c.png"></p>
+<p>⑦ユーザー登録が完了しました。LINE DevelopersIDの作成を行います</p>
+<p class="image-container"><img style="width: 456.00px" src="img\\3583149969fff6f1.png"></p>
+<p>⑧LINE開発者登録</p>
+<p>開発者名とメールアドレスを入力し、LINE開発者契約の内容を確認しチェックをいれ、アカウントを作成します。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\584ffc3ee1246335.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="チャネル作成" duration="0">
+        <h2 is-upgraded>３．１ 新規プロバイダーを作成<img style="width: 624.00px" src="img\\e8ec5528cac0f48d.png"></h2>
+<h2 is-upgraded><strong>３．２ チャネル作成</strong></h2>
+<p>チャネル設定で「Messaging API」を選択</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\ec8a1fad93e7a565.png"></p>
+<p>チャネルを作成します。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\99db3010645b7b2e.png"></p>
+<pre>・チャネルの種類
+ MessagingAPI（自動で選択済み）
+・プロバイダー
+ 先ほど作成したプロバイダー（自動で選択済み）
+・会社・事業者の所在国・地域
+ 【日本】を選択
+・チャネルアイコン
+ 今回のチャネルのアイコンを設定できます。
+ 特にない場合は選択無しでも、後ほど設定できます。
+・チャネル名
+ 20230524ハンズオン
+ など、任意のチャネル名を設定してください。
+・チャネルの説明
+ 簡単な説明をいれます。チャネル名と同じでも問題ありません。
+・大業種
+ 個人
+・小業種
+ 個人（その他）
+・メールアドレス
+ 自動入力済み
+・プライバリーポリシーURL
+ サービス利用規約URL
+ 今回は空欄。</pre>
+<p><strong>「LINE公式アカウント利用規約」</strong>と<strong>「LINE公式アカウントAPI利用規約」</strong>にチェックをいれ作成ボタンを押します。</p>
+<p>確認画面がでますので確認をしてＯＫボタンを押下します。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\7fe16d5d36d030ed.png"></p>
+<h3 is-upgraded><strong>【情報利用に関する同意について】を読み【同意する】を押下</strong></h3>
+<p class="image-container"><img style="width: 624.00px" src="img\\dd3680396b52ff8b.png"></p>
+<h3 is-upgraded><strong>ZHDグループへの情報提供に関する個別規約への同意についてを読み【同意する】を押下</strong></h3>
+<aside class="warning"><p>一番下までスクロールしないと【同意する】ボタンが押せません。</p>
+</aside>
+<p class="image-container"><img style="width: 624.00px" src="img\\671685e47955a35d.png"></p>
+<p>これでLINE DevelopersからLINE公式アカウントの作成が完了しました。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\40db2085ad2ec6dc.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="MessagingAPI設定" duration="0">
+        <aside class="special"><p>ここから少し聞きなれない言葉が出てくるかもしれませんが、難しくありませんのでご安心ください。</p>
+</aside>
+<h2 is-upgraded><strong>４．１ チャネルアクセストークンの発行</strong></h2>
+<p>このチャネルと後ほど作成するGAS(Google Apps Script)をつなぐ認証キーを発行します。</p>
+<p>先ほどの画面で<strong>「MessagingAPI設定」</strong>タブを押し、下部にある「チャネルアクセストークン(長期)」の発行ボタンを押します。すると長い文字列が表示されます。これが「チャネルアクセストークン」となり、認証に使われる文字列となります。外部に漏れると、このLINEチャネルが悪用される恐れがありますので、ご注意ください。</p>
+<p>この発行されたチャネルアクセストークンをメモしてください。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\1ed65c0ade2f6fb9.png"></p>
+<h2 is-upgraded><strong>４．２ webhook設定</strong></h2>
+<p>Webhookとは、http通信でデータを送信する先を設定することです。</p>
+<p>LINEから入力されたデータをどこのURLに送信するかを設定します。</p>
+<aside class="warning"><p>今回はGASのURLに送信しますので、設定は８．webhook設定で行います。</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="LINE公式アカウント機能の設定" duration="0">
+        <p>LINE Developersの機能では、高度なMessaging APIの設定などは行えますが、簡単な応答メッセージや、挨拶メッセージの設定は、LINE official Account Managerにて行います。その他、チャネルのアイコンや名称、リッチメニューの設定などもLINE official Account Managerにて行います。</p>
+<h2 is-upgraded><strong>５．１ LINEチャット機能ON</strong></h2>
+<aside class="special"><p>OfficialAccountManagerでLINEチャットの機能をONにすることにより、webhookとLINEチャットの機能の併用ができます。</p>
+</aside>
+<p>では設定を行います。</p>
+<p>MessagingAPI設定タブから、下部にある応答メッセージの編集ボタンをクリックします。するLINE official Account Managerに飛びます。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\73ecad4eff82242c.png"></p>
+<p>LINE official Account Managerの画面から、応答設定にある、【チャット】をＯＮにします。</p>
+<p>すると自動的に【応答メッセージ】の項目の表示が消えます。</p>
+<aside class="special"><p>実際は、LINEチャットの設定で応答時間外のときは応答メッセージが返るようになっておりますが、初期設定では応答時間は24時間全曜日対応になっているため、応答メッセージが返らないようになっております。</p>
+</aside>
+<p class="image-container"><img style="width: 624.00px" src="img\\c9e3e942bc147bc8.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="スプレッドシートおよびGASの作成" duration="0">
+        <p>データベースとして使用するスプレッドシートとGASの作成を行います。</p>
+<p>今回コード(プログラム)は、事前に作成しておりますのでそちらを利用します。</p>
+<h2 is-upgraded><strong>６．１ スプレッドシートのコピー</strong></h2>
+<p>下記アドレスの開きスプレッドシートを各自のマイドライブにコピーしてください。</p>
+<p><a href="https://docs.google.com/spreadsheets/d/1hQZ7DXq4loLJszG6jVxrPLf7oGa53x-1XuRvIKmD8Po/edit?usp=sharing" target="_blank"><paper-button class="colored" raised>スプレッドシートを開く</paper-button></a></p>
+<p class="image-container"><img style="width: 547.00px" src="img\\f53154ba984c703d.png"></p>
+<p class="image-container"><img style="width: 402.00px" src="img\\a9c7663db8a0c99d.png"></p>
+<h2 is-upgraded><strong>６．２ アクセストークンの記載</strong></h2>
+<p>４．１でLINEdevelopersで発行しましたアクセストークン(長期)を【設定】シートのセルC2に貼り付けます。</p>
+<aside class="warning"><p>チャネルアクセストークの始まりが＋やーの場合、うまく設定されない場合があります。</p>
+<p>その際は、LINE developersでMessegingAPI設定⇒チャネルアクセストークンの右側にある【再発行】のボタンを押下して、先頭部分の文字列が、英数字のもの再発行して貼り付けてください。</p>
+</aside>
+<h2 is-upgraded><img style="width: 624.00px" src="img\\65b113b1b2cc5aa9.png"></h2>
+<h2 is-upgraded><strong>６．３ AppsScriptの起動のデプロイ</strong></h2>
+<p>GASのコードが記載されているか確認をします。</p>
+<p>スプレッドシートから「拡張機能」→「Apps Script」を選択してます。</p>
+<p>（1回選択するだけだと、開かないことがあるので、その時はもう1度同じように選択してください。）</p>
+<p>スクリプトエディタが開き、今回使用するコードがみられます。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\b0a629cec2c31813.png"></p>
+<p class="image-container"><img style="width: 624.00px" src="img\\bbb035b307880ece.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="７ 新しいデプロイの実行" duration="0">
+        <p>保存が完了しましたら、デプロイをします。</p>
+<aside class="special"><p>デプロイとは、開発したスクリプトをサーバー上に展開して利用できるようにすることです。</p>
+</aside>
+<p>では、実際にやってみましょう。</p>
+<p>右上にある、「デプロイ」ボタンから「新しいデプロイ」を選択します。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\26747880308ea097.png"></p>
+<p>新しいデプロイ画面でウェブアプリを選択します。</p>
+<p>そして各項目を入力します。</p>
+<pre>・説明
+ 例）ハンズオンデプロイ初回
+ ※この欄は空欄でもかまいません
+・ウェブアプリ
+ 自分
+・アクセスできるユーザー
+ 全員</pre>
+<p>に設定して、デプロイボタンを押します。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\de050cfb643c8789.png"></p>
+<p>初めてそのコードをデプロイするときは、承認してもよいかの確認がありますので</p>
+<p>「アクセスを承認」ボタンを押します。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\dc4ee6efeaf3917.png"></p>
+<p>次にどのアカウントで承認するか選択します。</p>
+<p>スプレッドシートおよびGASを作成したアカウントを選択します。</p>
+<aside class="special"><p>表示されている言語が英語になっている場合、左下にある言語設定を、「日本語」に変更してください。</p>
+</aside>
+<p class="image-container"><img style="width: 497.00px" src="img\\eca2a789b26362ac.png"></p>
+<aside class="warning"><p>ここが、要注意ポイントです。</p>
+<p>デプロイするコードはスプレッドシートなどにアクセスするため、Googleから注意画面が表示されます。</p>
+<p>「安全なページに戻る」を押すと、先に進まずに戻りますので、左下に表示されている「詳細」をクリックします。</p>
+</aside>
+<p class="image-container"><img style="width: 624.00px" src="img\\bfb827f9d74839c2.png"></p>
+<aside class="warning"><p>詳細が展開されましたら、【〇〇〇〇〇（ファイル名）（安全ではないページ）に移動】をクリックします。</p>
+</aside>
+<p class="image-container"><img style="width: 624.00px" src="img\\2553be3eec543334.png"></p>
+<p>作成したGASがスプレッドシートのデータを編集したり、外部サービス(今回であれば、LINEDevelopers)へ接続してもよいかの確認が来ますので、許可ボタンを押します。</p>
+<p class="image-container"><img style="width: 488.00px" src="img\\6344b3d02c1bad53.png"></p>
+<p>デプロイが完了です。</p>
+<p>以下の画面が表示されます。</p>
+<p>ウェブアプリに表示されているURLが、作成をしたWEBアプリのURLです。</p>
+<aside class="special"><p>こちらをLINE Developersのwebhookの送信先に設定しますのでコピーしてください。</p>
+</aside>
+<p class="image-container"><img style="width: 624.00px" src="img\\1ceae49b24faeea.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="webhook設定" duration="0">
+        <p>先ほどGASで作成したWEBアプリのURLをwebhookの送信先として設定します。</p>
+<p>LINEDevelopersの画面に戻り、MessagingAPI設定タブを選択し、Webhook設定のWebhook URLのところに、先ほどコピーしたWEBアプリのURLを貼り付けます。</p>
+<p>貼り付けて更新ボタンを押し、そしてwebhookの利用にチェックをいれます。</p>
+<aside class="warning"><p>自動でWebhookの利用にチェックが入りませんので、ご注意ください。</p>
+</aside>
+<p class="image-container"><img style="width: 624.00px" src="img\\68e0a7edfb02517e.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="完成！動くか試してみましょう！" duration="0">
+        <p>以上で、完了となります。</p>
+<p>実際に、動くか皆さんのLINEに友だち登録をして、動作するか試してみましょう。</p>
+<p>LINEDevelopersから、MessagingAPI設定タブを選択します。</p>
+<p>するとQRコードが表示されておりますので、こちらをスマホで読み込んで友だち登録します。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\cf0c1a81d421dab7.png"></p>
+<p>以下のようにメッセージがかえってくれば成功です！！</p>
+<p class="image-container"><img style="width: 346.00px" src="img\\85df249227736144.png"></p>
+<p>それでは先ほど、コピーして保存しましたスプレッドシートの【<strong>問い合わせ内容</strong>】シートご覧ください。</p>
+<p>こちらで話しかけたメッセージが保存されていると思います。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\20f400b43f92e234.png"></p>
+<aside class="special"><p>データベースを変えれば、お問い合わせ対応のチャットボットが作成できます。</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="LINEnotifyの設定" duration="0">
+        <p>今のままでは、3回連続でデータベースにないものを問いかけても通知は行きません。</p>
+<p>通知が行くように、設定をいたします。</p>
+<aside class="special"><p>LINEnotifyとは</p>
+<p>連携すると、LINEが提供する公式アカウント「LINE Notify」から通知を受信する事ができるサービスです。</p>
+</aside>
+<p><a href="https://notify-bot.line.me/ja/" target="_blank">LINEnotify</a>のHPにアクセスし、右上のボタンからログインします。</p>
+<p>その後、名前のところを選択してマイページを選択します。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\9a4f361086a1033f.png"></p>
+<p>次のページに行くとページの初めか一番下にトークンの発行ボタンがありますので</p>
+<p>そこで【トークンを発行する】を選択します。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\648424e0ed5bd2e6.png"></p>
+<p>トークンの発行画面がでてきます。</p>
+<p>そこで</p>
+<pre>①トークン名(この名前で通知されます。問い合わせチャットのようなわかるものでOKです！)
+②どこで受け取るか
+（グループか個人か選択できます。店員さん全員に通知などの場合は事前にグループを作り選択します。
+個人の場合は一番上の【1：1でLINE Notifyから通知を受け取る】を選択します。）
+</pre>
+<p>を選択して、決まりましたら一番下の</p>
+<p>③【トークンを発行する】のボタンを押します。</p>
+<p class="image-container"><img style="width: 601.00px" src="img\\5d7810e5fa2f3176.png"></p>
+<p>そうするとトークンが発行されます！</p>
+<p>注意書きのように、ここでしか発行されずに閉じるを押すと二度と表示されませんので</p>
+<p>すぐにコピーをして、スプレッドシートの【notify】シートのB3にはりつけてください。</p>
+<p>A3セルには誰のもか分かるように名前を記載してください。</p>
+<p class="image-container"><img style="width: 359.00px" src="img\\dce0b95dd7d7818b.png"></p>
+<aside class="special"><p>複数人にLINEnotifyを送りたい場合は、先のほどでLINEグループを選択するか、1人1人にLINEnotifyでトークンを発行してもらいB列のB3・B4,,,,と順に下側に貼り付けていってください。</p>
+</aside>
+<p>これでデータベースにない問い合わせが3回続いた場合通知が行くようになります。</p>
+<p class="image-container"><img style="width: 480.00px" src="img\\d88d28c91415d26f.png"></p>
+<aside class="special"><p>チャットボットを登録した同じ端末にLINEnotifyを送ると、LINEの問い合わせ回答とLINEnotifyが一緒に届き、ちょっとややこしくなるかもしれませんので、もし、別のスマホがありましたら、そのスマホでLINEの問い合わせをしてみてください。</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="LINEチャットの確認" duration="0">
+        <p>LINEチャットをONにいたしましたのでLINEチャットの状況を確認します。</p>
+<p>先ほどチャットのONの設定しました<a href="https://account.line.biz/login" target="_blank">LINEOfficialAccountManager</a>からチャットを開いてください。</p>
+<p class="image-container"><img style="width: 590.00px" src="img\\c5eeb665eee56eb4.png"></p>
+<p>チャット画面はこのようなものになっております。</p>
+<p class="image-container"><img style="width: 624.00px" src="img\\87bd4f18796612e5.png"></p>
+<p>LINEチャットの詳細な紹介は操作は<a href="https://www.linebiz.com/jp/column/technique/20190830/" target="_blank">こちらをご確認ください</a>。</p>
+<p>今回はbotとLINEチャットの区別がわかるようにbotにはメッセージ送信時にアイコンをつけております。</p>
+<p class="image-container"><img style="width: 505.00px" src="img\\294c50e8c5ab2f9e.png"></p>
+<p>詳細はGASの下記コードをご確認ください。</p>
+<p>LINEの<a href="https://developers.line.biz/ja/docs/messaging-api/icon-nickname-switch/" target="_blank">ドキュメントはこちら</a>です<strong>。</strong></p>
+<pre>&#34;sender&#34;: {
+          &#34;name&#34;: &#34;自動応答bot&#34;,
+        &#34;iconUrl&#34;:&#34;https://drive.google.com/uc?export=view&amp;id=〇〇〇&#34;
+           }</pre>
+<p>以上で、完成となります！</p>
+<p>いかがでしたでしょうか。</p>
+<p>今回はゴミ分別でしたが、いろいろなチャットbotが作れると思いますのでいろいろと変更して色々なものを作成してください！</p>
+<p>(個人・商用ご利用は自由となっております。)</p>
+<p>不明点がございましたら</p>
+<p>問BOXスペシャルマンとマッシュルーマン LINE公式アカウントまで</p>
+<p>お気軽にお問い合わせください！</p>
+<p><a href="https://lin.ee/PfVLNKa" target="_blank">https://lin.ee/PfVLNKa</a></p>
+<p class="image-container"><img style="width: 123.00px" src="img\\388d034cf4eff21d.png"></p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>

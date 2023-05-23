@@ -1,0 +1,25 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2023-05-22T14:33:08Z",
+  "id": "20230524",
+  "duration": 0,
+  "title": "webhookとLINEチャットの併用を体験してみよう！～チャットボットとLINEチャットの併用～",
+  "authors": "specialman9999",
+  "summary": "webhookとLINEチャットの併用を体験してみよう！～チャットボットとLINEチャットの併用～",
+  "source": "1LZoIxUkyDUwdDA1xc19dSwZ763Lx9hznqFA5iBar66A",
+  "theme": "web",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "web"
+  ],
+  "tags": [
+    "line",
+    "web"
+  ],
+  "url": "20230524"
+}
